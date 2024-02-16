@@ -1,1 +1,14 @@
-﻿
+﻿@model Comic
+<div class="row">
+    <div class="card col-md-4" style="width:18em;">
+        <img src="@Model.Imagen" class="img-top" />
+        <div class="card-body">
+            <p>@Model.Nombre</p>
+            <p>@Model.Descripcion</p>
+        </div>
+    </div>
+</div>
+<h1 class="mb-3 text-center">¿SEGURO QUE QUIERES BORRAR EL COMIC "@Model.Nombre"?</h1>
+<form method="post" class="mx-auto text-center">
+    <button type="submit" class="btn btn-danger">Si, Eliminar</button>
+</form>

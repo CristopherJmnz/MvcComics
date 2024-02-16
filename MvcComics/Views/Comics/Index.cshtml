@@ -1,11 +1,14 @@
 ﻿@model List<Comic>
+<div class="row mx-0-auto text-center">
 @foreach(Comic comic in @Model)
 {
-    <div class="card col-md-4" style="width:18em;">
+    <div class="card col-md-4" style="width:18rem;">
         <img src="@comic.Imagen" class="img-top" />
         <div class="card-body">
             <p>@comic.Nombre</p>
             <p>@comic.Descripcion</p>
+            <a class="btn btn-danger" asp-controller="Comics" asp-action="Delete" asp-route-idComic="@comic.IdComic">Eliminar</a>
         </div>
     </div>
 }
+</div>

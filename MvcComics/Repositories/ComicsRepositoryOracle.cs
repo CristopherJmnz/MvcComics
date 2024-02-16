@@ -1,44 +1,44 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using MvcComics.Models;
+using Oracle.ManagedDataAccess.Client;
 using System.Collections.Generic;
+using System;
 using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace MvcComics.Repositories
 {
-    #region PROCEDURES SQL SERVER
-//    create procedure SP_INSERT_COMIC
-//(@NOMBRE NVARCHAR(600),@IMAGEN NVARCHAR(600),@DESCRIPCION NVARCHAR(600))
+    #region PROCEDURES ORACLE
+//    create or replace procedure SP_INSERT_COMIC
+//    (p_NOMBRE COMICS.NOMBRE%TYPE, p_IMAGEN COMICS.IMAGEN%TYPE, p_DESCRIPCION COMICS.DESCRIPCION%TYPE)
 //AS
-//    declare @maxId int
-//    select @maxId=Max(COMICS.IDCOMIC) FROM COMICS;
-//    insert into comics values(@maxId+1, @nombre, @imagen, @descripcion);
-//    GO
+//Begin
+
+//    insert into comics values((SELECT MAX(IDCOMIC) FROM COMICS) + 1 ,p_nombre,p_imagen,p_descripcion);
+//  commit;
+//end SP_INSERT_COMIC;
     #endregion
-    public class ComicsRepositorySqlServer : IComicRepository
+    public class ComicsRepositoryOracle : IComicRepository
     {
-        private SqlConnection cn;
-        private SqlCommand com;
+        private OracleConnection cn;
+        private OracleCommand com;
         private DataTable tablaComics;
 
-        public ComicsRepositorySqlServer()
+        public ComicsRepositoryOracle()
         {
-            string connectionString = @"Data Source=LOCALHOST\SQLEXPRESS;Initial Catalog=COMICS;Persist Security Info=True;User ID=sa;Password='';";
-            this.cn = new SqlConnection(connectionString);
-            this.com = new SqlCommand();
+            string connectionString = @"User Id=SYSTEM;Password=oracle;Data Source=LOCALHOST:1521/XE; Persist Security Info=True";
+            this.cn = new OracleConnection(connectionString);
+            this.com = new OracleCommand();
             this.com.Connection = this.cn;
-            string sql = "select * from comics";
+            string sql = "select * from Comics";
             this.tablaComics = new DataTable();
-            SqlDataAdapter ad = new SqlDataAdapter(sql,this.cn);
-            ad.Fill(this.tablaComics);
+            OracleDataAdapter adapter = new OracleDataAdapter(sql, this.cn);
+            adapter.Fill(this.tablaComics);
         }
-
         public void DeleteComic(int idComic)
         {
-            string sql = "delete from comics where idcomic=@idcomic";
-            this.com.Parameters.AddWithValue("@idcomic", idComic);
+            string sql = "delete from comics where idcomic=:idcomic";
+            OracleParameter pamId = new OracleParameter(":idcomic", idComic);
+            this.com.Parameters.Add(pamId);
             this.com.CommandText = sql;
             this.com.CommandType = CommandType.Text;
             this.cn.Open();
@@ -72,27 +72,30 @@ namespace MvcComics.Repositories
             {
                 Comic com = new Comic
                 {
-                    Descripcion=row.Field<string>("DESCRIPCION"),
-                    IdComic= row.Field<int>("IDCOMIC"),
-                    Imagen=row.Field<string>("IMAGEN"),
-                    Nombre= row.Field<string>("NOMBRE")
+                    Descripcion = row.Field<string>("DESCRIPCION"),
+                    IdComic = row.Field<int>("IDCOMIC"),
+                    Imagen = row.Field<string>("IMAGEN"),
+                    Nombre = row.Field<string>("NOMBRE")
                 };
                 comics.Add(com);
             }
             return comics;
         }
 
-
         public void InsertComic(string nombre, string imagen, string descripcion)
         {
             var consulta = from datos in this.tablaComics.AsEnumerable()
                            select datos;
-            int maximoId = consulta.Max(x=>x.Field<int>("IDCOMIC")) +1;
-            string sql = "Insert into comics values(@id,@nombre,@imagen,@descripcion)";
-            this.com.Parameters.AddWithValue("@id",maximoId);
-            this.com.Parameters.AddWithValue("@nombre",nombre);
-            this.com.Parameters.AddWithValue("@imagen",imagen);
-            this.com.Parameters.AddWithValue("@descripcion",descripcion);
+            int maximoId = consulta.Max(x => x.Field<int>("IDCOMIC")) + 1;
+            string sql = "Insert into comics values(:id,:nombre,:imagen,:descripcion)";
+            OracleParameter pamId = new OracleParameter(":?", maximoId);
+            this.com.Parameters.Add(pamId);
+            OracleParameter pamNombre = new OracleParameter(":?", nombre);
+            this.com.Parameters.Add(pamNombre);
+            OracleParameter pamImagen = new OracleParameter(":?", imagen);
+            this.com.Parameters.Add(pamImagen);
+            OracleParameter pamDescripcion = new OracleParameter(":?", descripcion);
+            this.com.Parameters.Add(pamDescripcion);
             this.com.CommandText = sql;
             this.com.CommandType = CommandType.Text;
             this.cn.Open();
@@ -105,9 +108,12 @@ namespace MvcComics.Repositories
         {
             this.com.CommandText = "SP_INSERT_COMIC";
             this.com.CommandType = CommandType.StoredProcedure;
-            this.com.Parameters.AddWithValue("@nombre", nombre);
-            this.com.Parameters.AddWithValue("@imagen", imagen);
-            this.com.Parameters.AddWithValue("@descripcion", descripcion);
+            OracleParameter pamNombre = new OracleParameter(":?", nombre);
+            this.com.Parameters.Add(pamNombre);
+            OracleParameter pamImagen = new OracleParameter(":?", imagen);
+            this.com.Parameters.Add(pamImagen);
+            OracleParameter pamDescripcion = new OracleParameter(":?", descripcion);
+            this.com.Parameters.Add(pamDescripcion);
             this.cn.Open();
             this.com.ExecuteNonQuery();
             this.cn.Close();

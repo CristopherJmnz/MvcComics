@@ -45,7 +45,7 @@ namespace MvcComics.Controllers
         {
             List<Comic> comics = this.repo.GetAllComics();
             BuscadorComic busc=new BuscadorComic();
-            busc.comics = comics;
+            busc.Comics = comics;
             return View(busc);
         }
 
@@ -55,25 +55,24 @@ namespace MvcComics.Controllers
             Comic comic=this.repo.FindComic(idComic);
             List<Comic> comics = this.repo.GetAllComics();
             BuscadorComic busc = new BuscadorComic();
-            busc.comics = comics;
-            busc.comic = comic;
+            busc.Comics = comics;
+            busc.Comic = comic;
             return View(busc);
         }
 
+        [Route("deletePost")]
         public IActionResult Delete(int idComic)
         {
             Comic comic=this.repo.FindComic(idComic);
             return View(comic);
         }
 
-        //[HttpPost]
-        //public IActionResult Delete(int idComic)
-        //{
-        //    this.repo.DeleteComic(idComic);
-        //    return RedirectToAction("Index");
-        //}
-
-
-
+        [Route("deletePost")]
+        [HttpPost]
+        public IActionResult DeletePost(int idComic)
+        {
+            this.repo.DeleteComic(idComic);
+            return RedirectToAction("Index");
+        }
     }
 }

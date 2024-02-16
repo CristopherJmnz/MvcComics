@@ -6,7 +6,6 @@ namespace MvcComics.Repositories
     {
         List<Comic> GetAllComics();
         Comic FindComic(int idComic);
-        List<string> GetNombreComics();
         void InsertComic(string nombre,string imagen,string descripcion);
         void InsertComicProcedure(string nombre,string imagen,string descripcion);
         void UpdateComic(int idComic,string nombre, string imagen, string descripcion);
