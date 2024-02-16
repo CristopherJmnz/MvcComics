@@ -1,6 +1,6 @@
 ﻿@model BuscadorComic
-<form method="post">
-    <select name="idComic">
+<form method="post" class="mb-3">
+    <select name="idComic" class="form-select mb-3">
         @foreach (Comic com in Model.comics)
         {
             <option value="@com.IdComic">@com.Nombre</option>

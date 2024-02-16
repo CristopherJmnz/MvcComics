@@ -29,6 +29,18 @@ namespace MvcComics.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult CreateProcedure()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateProcedure(Comic comic)
+        {
+            this.repo.InsertComicProcedure(comic.Nombre, comic.Imagen, comic.Descripcion);
+            return RedirectToAction("Index");
+        }
+
         public IActionResult Buscador()
         {
             List<Comic> comics = this.repo.GetAllComics();
@@ -47,5 +59,21 @@ namespace MvcComics.Controllers
             busc.comic = comic;
             return View(busc);
         }
+
+        public IActionResult Delete(int idComic)
+        {
+            Comic comic=this.repo.FindComic(idComic);
+            return View(comic);
+        }
+
+        //[HttpPost]
+        //public IActionResult Delete(int idComic)
+        //{
+        //    this.repo.DeleteComic(idComic);
+        //    return RedirectToAction("Index");
+        //}
+
+
+
     }
 }

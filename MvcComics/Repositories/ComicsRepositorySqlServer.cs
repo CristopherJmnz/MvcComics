@@ -1,10 +1,22 @@
-﻿using MvcComics.Models;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using MvcComics.Models;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MvcComics.Repositories
 {
+    #region PROCEDURES SQL
+//    create procedure SP_INSERT_COMIC
+//(@NOMBRE NVARCHAR(600),@IMAGEN NVARCHAR(600),@DESCRIPCION NVARCHAR(600))
+//AS
+//    declare @maxId int
+//    select @maxId=Max(COMICS.IDCOMIC) FROM COMICS;
+//    insert into comics values(@maxId+1, @nombre, @imagen, @descripcion);
+//    GO
+    #endregion
     public class ComicsRepositorySqlServer : IComicRepository
     {
         private SqlConnection cn;
@@ -87,6 +99,19 @@ namespace MvcComics.Repositories
             this.com.Parameters.AddWithValue("@descripcion",descripcion);
             this.com.CommandText = sql;
             this.com.CommandType = CommandType.Text;
+            this.cn.Open();
+            this.com.ExecuteNonQuery();
+            this.cn.Close();
+            this.com.Parameters.Clear();
+        }
+
+        public void InsertComicProcedure(string nombre, string imagen, string descripcion)
+        {
+            this.com.CommandText = "SP_INSERT_COMIC";
+            this.com.CommandType = CommandType.StoredProcedure;
+            this.com.Parameters.AddWithValue("@nombre", nombre);
+            this.com.Parameters.AddWithValue("@imagen", imagen);
+            this.com.Parameters.AddWithValue("@descripcion", descripcion);
             this.cn.Open();
             this.com.ExecuteNonQuery();
             this.cn.Close();
