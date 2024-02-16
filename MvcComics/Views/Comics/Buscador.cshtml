@@ -1,0 +1,21 @@
+﻿@model BuscadorComic
+<form method="post">
+    <select name="idComic">
+        @foreach (Comic com in Model.comics)
+        {
+            <option value="@com.IdComic">@com.Nombre</option>
+        }
+    </select>
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+@if (Model.comic != null)
+{
+    <div class="card col-md-4" style="width:18em;">
+        <img src="@Model.comic.Imagen" class="img-top" />
+        <div class="card-body">
+            <p>@Model.comic.Nombre</p>
+            <p>@Model.comic.Descripcion</p>
+        </div>
+    </div>
+}
